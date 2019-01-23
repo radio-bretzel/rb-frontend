@@ -1,105 +1,56 @@
 import React, { Component } from 'react';
-import {Button} from '@material-ui/core/'
-import Dropzone from 'react-dropzone'
-import classNames from 'classnames'
-import request from "superagent";
-
-class Upload extends Component {
-
-  constructor(props){
-    super(props)
-    this.state = {currentInputValue: "" , tracks: []}
-    this.updateInputValue = this.updateInputValue.bind(this);
-    this.addTrackToList = this.addTrackToList.bind(this);
-    this.uploadFiles = this.uploadFiles.bind(this);
-  }
-
-  updateInputValue(event){
-      console.log(event.target.value)
-      this.setState({currentInputValue: event.target.value, tracks: this.state.tracks})
-  }
+import {Fab} from '@material-ui/core';
+import AddIcon from "@material-ui/icons/Add"
+import UploadForm from './UploadForm'
+import '../css/Upload.css'
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import { withSnackbar } from 'notistack';
 
 
 
-  addTrackToList(acceptedFiles, rejectedFiles){
-    var list = this.state.tracks
-    acceptedFiles.forEach(element => {
+class Upload extends Component{
 
-      if(element !== ""){
+    constructor(props){
+        super(props)
+        this.state = {modalState : false}
+    }
 
-        if(this.state.tracks.includes(element)){
-          console.log("La valeur existe deja")
-          return
-        }
-  
-        list.push(element)
-        this.setState(state => ({
-          tracks:list
-    
-        }));
-        console.log('Added item to track list')
-        console.log(this.state.tracks)
+    handleOpenModal(){
+        this.setState({modalState : true})
+    }
+    handleCloseModal(){
+        this.setState({modalState : false})
+    }
+
+render(){
+    if(this.props.tab !== 3){
+        return null;
       }
-      else{
-        console.log("Input is empty !")
-      }
+    return(
+        <div className="fixedbutton">
+        <Fab onClick={this.handleOpenModal.bind(this)} color="primary" variant="extended" aria-label="Edit">
+        <AddIcon />
+        Ajouter une musique
+      </Fab>
+      <Dialog
+          open={this.state.modalState}
+          onClose={this.handleCloseModal.bind(this)}
+          aria-labelledby="form-dialog-title"
+        >
+        <DialogTitle id="form-dialog-title">Ajouter un fichier</DialogTitle>
+
+        <DialogContent>
+            <UploadForm/>
+          </DialogContent>
+      </Dialog>
       
-    });
+        </div>
+
+    )
+}
     
-    
-  }
-
-  uploadFiles(){
-    const req = request.post('http://192.168.56.101:5000/track');
-    const files = this.state.tracks
-    files.forEach(file => {
-      req.attach(file.name, file);
-    });
-    console.log("Uploading Files")
-    req.end();
-  }
-
-  render() {
-    return (
-
-      <div>
-
-
-
-<Dropzone onDrop={this.addTrackToList}>
-        {({getRootProps, getInputProps, isDragActive}) => {
-          return (
-            <div
-              {...getRootProps()}
-              className={classNames('dropzone', {'dropzone--isActive': isDragActive})}
-            >
-              <input {...getInputProps()} />
-              {
-                isDragActive ?
-                  <p>Drop files here...</p> :
-                  <p>Try dropping some files here, or click to select files to upload.</p>
-              }
-            </div>
-          )
-        }}
-      </Dropzone>
-
-        <ul>
-        {this.state.tracks.map((track) =>
-          <li key={track.name}>{track.name}</li>
-             )}
-        </ul>
-
-        <Button onClick={this.uploadFiles}>Envoyer les fichiers</Button>
-
-
-
-        
-
-      </div>
-
-    );
-  }
 }
 
-export default Upload;
+export default withSnackbar(Upload);
