@@ -1,7 +1,16 @@
 import Vue from 'vue'
-import Vuetify from 'vuetify/lib'
+import Vuetify, {VApp, // required
+  VNavigationDrawer,VList,VCard,VToolbar,VListTile,VBtn} from 'vuetify/lib'
 import 'vuetify/src/stylus/app.styl'
 
 Vue.use(Vuetify, {
-  iconfont: 'md',
+  components: {
+    VApp,
+    VNavigationDrawer,
+    VList,
+    VCard,
+    VToolbar,
+    VListTile,
+    VBtn
+  },
 })
